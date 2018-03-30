@@ -19,9 +19,14 @@ public class RabbitMqConfig {
     public static final String ROUTING_KEY = "server1.app1.module1.info";
     public static final String ERROR_ROUTING_KEY = "server1.app1.module1.error";
 
-    @Bean
-    Queue queue() {
+    @Bean("infoQueue")
+    Queue infoQueue() {
         return new Queue(ROUTING_KEY, true);
+    }
+
+    @Bean("errorQueue")
+    Queue errorQueue() {
+        return new Queue(ERROR_ROUTING_KEY, true);
     }
 
     @Bean
@@ -30,8 +35,13 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    Binding binding(Queue queue, TopicExchange topicExchange) {
+    Binding infoQueueBinding(@Qualifier("infoQueue") Queue queue, TopicExchange topicExchange) {
         return BindingBuilder.bind(queue).to(topicExchange).with(ROUTING_KEY);
+    }
+
+    @Bean
+    Binding errorQueueBinding(@Qualifier("errorQueue") Queue queue, TopicExchange topicExchange) {
+        return BindingBuilder.bind(queue).to(topicExchange).with(ERROR_ROUTING_KEY);
     }
 
     @Bean
