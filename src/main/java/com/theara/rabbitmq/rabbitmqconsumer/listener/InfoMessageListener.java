@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
  * created on Mar 30, 2018
  */
 
-@Component
-public class MessageListenerImpl implements MessageListener {
+@Component("infoMessageListener")
+public class InfoMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        System.out.println("The message is : " + message);
+        System.out.println("The info message is : " + message);
     }
 }

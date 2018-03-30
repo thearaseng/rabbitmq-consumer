@@ -16,7 +16,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMqConfig {
 
-    public static final String ROUTING_KEY = "my.queue.key";
+    public static final String ROUTING_KEY = "server1.app1.module1.info";
+    public static final String ERROR_ROUTING_KEY = "server1.app1.module1.error";
 
     @Bean
     Queue queue() {
@@ -34,19 +35,25 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter messageListenerAdapter) {
+    public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, @Qualifier("infoMessageListener") MessageListener listener) {
 
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(ROUTING_KEY);
-        container.setMessageListener(messageListenerAdapter);
+        container.setMessageListener(new MessageListenerAdapter(listener, "onMessage"));
 
         return container;
     }
 
     @Bean
-    public MessageListenerAdapter myQueueListener(@Qualifier("messageListenerImpl") MessageListener listener) {
-        return new MessageListenerAdapter(listener, "onMessage");
+    public SimpleMessageListenerContainer errorMessageListenerContainer(ConnectionFactory connectionFactory, @Qualifier("errorMessageListener") MessageListener listener) {
+
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(ERROR_ROUTING_KEY);
+        container.setMessageListener(new MessageListenerAdapter(listener, "onMessage"));
+
+        return container;
     }
 
 }
